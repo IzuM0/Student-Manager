@@ -67,6 +67,8 @@
 
    }catch(error){
     console.error('Error updating student record:', error);
+    return res.status(500).json({ message: 'Internal Server Error' });
+
 
    }
 
@@ -102,15 +104,25 @@
   //search for student records
   const studentSearch = async (req,res) =>{
     try{
-        const { email } = req.query;
-        if(!email){
-            return res.status(400).json({message: 'email is required for search'});
+      //search by email
+        const { email, lastName } = req.query;
+        if(email){
+          const studentByEmail = await StudentRec.findOne({ email });
+          if(!studentByEmail){
+            return res.status(404).json({message: 'Student record not found with that email'});
+          }
+          return res.status(200).json({message: 'Student record found', student: studentByEmail});
         }
-        const student = await StudentRec.findOne({ email });
-        if(!student){
-            return res.status(404).json({message: 'Student record not found'});
+
+        if(lastName){
+          const studentByLastName = await StudentRec.findOne({ lastName });
+          if(!studentByLastName){
+            return res.status(404).json({message: 'Student record not found with that last name'});
+          }
+          return res.status(200).json({message: 'Student record found', student: studentByLastName});
         }
-        return res.status(200).json({message: 'Student record found', student});
+        return res.status(400).json({message: 'Please provide an email or last name to search for a student record'});
+        
         
     }catch(error){
         console.error('Error searching for student record:', error);
