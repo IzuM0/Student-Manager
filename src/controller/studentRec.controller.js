@@ -73,9 +73,20 @@
  }
 // delete a student record
  const deleteStudentrec = async(req,res)=>{
+  try{
     const {id} =req.params;
+    if(!id){
+        return res.status(400).json({message: 'Student ID is required for deletion'});
+    }
     const deleteStudent = await StudentRec.findByIdAndDelete(id);
+    if(!deleteStudent){
+        return res.status(404).json({message: 'Student record not found'});
+    }
     res.status(200).json({message: 'Student deleted successfully', deleteStudent});
+  }catch(error){
+    console.error('Error deleting student record:', error);
+    return res.status(500).json({message: 'Internal Server Error'});
+  }
  }
  //count all student records
   const countStudents = async (req,res)=>{
